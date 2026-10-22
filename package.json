@@ -1,0 +1,11 @@
+{
+  "name": "ember-stick-war",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python -m http.server 4173 --directory dist",
+    "test": "node --test tests/*.test.mjs",
+    "check": "node --check dist/game.js && node --check dist/engine.js && node --check dist/art.js"
+  }
+}
