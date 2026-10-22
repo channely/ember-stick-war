@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>10 · 三张地图，三个问题</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:24px;background:#f7f2e6;color:#293b32;font:16px/1.65 system-ui,sans-serif}main{max-width:760px;margin:auto}h1{font-size:24px;margin:0 0 8px}p{margin:9px 0;color:#657362}button,select,input{font:inherit}button{background:#426a4d;color:#fff6df;border:0;border-radius:7px;padding:10px 17px;cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.4;cursor:default}button.secondary{background:#e5decb;color:#52634c}label{display:inline-flex;align-items:center;gap:10px;margin:8px 16px 8px 0}canvas{display:block;width:100%;background:#d9ebd0;border:1px solid #b6c8aa;border-radius:12px;margin:15px 0}.board{background:#fffdf4;border:1px solid #ddd6bf;border-radius:10px;padding:18px;margin:15px 0}.numbers{display:flex;gap:14px;flex-wrap:wrap}.number{background:#ece4c8;padding:10px 16px;border-radius:8px}.number b{font-size:24px;color:#486b43}output{display:block;min-height:30px;margin:10px 0;color:#9e6c36}code{background:#e8e2ce;padding:2px 5px;border-radius:3px}small{color:#7f876d}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;border-bottom:1px solid #ddd6bf;padding:7px}.states{display:flex;gap:8px;flex-wrap:wrap}.states span{padding:6px 10px;background:#e8e4d2;border-radius:5px}.states .active{background:#426a4d;color:white}@media(max-width:500px){body{padding:15px}h1{font-size:21px}button{padding:9px 12px}.number{padding:8px 12px}}</style>
+<main>
+<h1>10 · 三张地图，三个问题</h1>
+<p>同一套游戏规则，读取三组关卡数据。切换关卡会开始新一局。</p>
+<label>关卡 <select id="level"><option value="0">草地 · 学会积攒</option><option value="1">沙地 · 保护矿工</option><option value="2">雪地 · 先守再攻</option></select></label><div class="numbers"><span class="number">黄金 <b id="gold"></b></span><span class="number">矿工 <b id="miners"></b></span><span class="number">我方基地 <b id="base"></b></span><span class="number">对方基地 <b id="enemy"></b></span></div>
+<canvas id="canvas" width="720" height="240"></canvas>
+<button id="miner">招募矿工 · 3 金</button><button id="guard">招募守卫 · 4 金</button><button id="start">开始</button><button id="defend" class="secondary">防守</button><button id="attack">进攻</button><button id="pause" class="secondary">暂停</button><button id="reset" class="secondary">重新开始</button>
+<div class="board"><b id="state"></b><div id="queue"></div><output id="message"></output></div>
+<script>
+"use strict";
+
+// 设计区：改一个数字，保存，再试。颜色只影响外观。
+const RULES={minerCost:3,guardCost:4,incomeTime:3,trainTime:2,speed:48,damage:2,cooldown:1};
+const LEVELS=[
+  {name:'草地：学会积攒',enemyHP:20,enemyEvery:12,enemyDamage:1,color:'#d9ebd0'},
+  {name:'沙地：保护矿工',enemyHP:26,enemyEvery:10,enemyDamage:1,color:'#edddb0'},
+  {name:'雪地：先守再攻',enemyHP:32,enemyEvery:9,enemyDamage:2,color:'#dce9ec'}
+];
+const $=id=>document.getElementById(id),ctx=$('canvas').getContext('2d');
+let gold,miners,units,queue,baseHP,enemyHP,time,incomeClock,enemyClock,status,last=0;
+let order='defend',levelIndex=0,nextId=1;
+function reset(){gold=8;miners=1;units=[];queue=[];baseHP=30;enemyHP=LEVELS[levelIndex].enemyHP;time=incomeClock=enemyClock=0;status='ready';order='defend';nextId=1;$('message').textContent='先招募矿工与守卫，再开始。';show();}
+function recruit(type){
+  if(status==='won'||status==='lost'||status==='paused')return;
+  const cost=type==='miner'?RULES.minerCost:RULES.guardCost;
+  if(gold<cost){$('message').textContent='黄金不够，等矿工带回来。';return;}
+  if(queue.length>=3){$('message').textContent='先来的要先训练，队列满了。';return;}
+  if(units.filter(u=>!u.team).length+miners+queue.length>=12){$('message').textContent='最多 12 名伙伴。';return;}
+  gold-=cost;queue.push({type,remaining:RULES.trainTime});show();
+}
+function spawn(team){units.push({id:nextId++,team,x:team?650:80,hp:team?7:10,cd:0});}
+function finish(result){status=result;$('message').textContent=result==='won'?'胜利！请讲讲哪条规则帮助了你。':'这次没有守住。下一次想只改哪一步？';}
+function update(dt){
+  if(status!=='playing')return;
+  time+=dt;incomeClock+=dt;enemyClock+=dt;
+  if(incomeClock>=RULES.incomeTime){incomeClock-=RULES.incomeTime;gold+=miners;}
+  if(queue.length){queue[0].remaining-=dt;if(queue[0].remaining<=0){const done=queue.shift();if(done.type==='miner')miners++;else spawn(0);}}
+  if(enemyClock>=LEVELS[levelIndex].enemyEvery){enemyClock=0;spawn(1);}
+  for(const u of units){
+    if(u.hp<=0)continue;u.cd-=dt;
+    const enemies=units.filter(v=>v.hp>0&&v.team!==u.team).sort((a,b)=>Math.abs(a.x-u.x)-Math.abs(b.x-u.x));
+    const target=enemies[0],distance=target?Math.abs(target.x-u.x):Infinity;
+    const destination=u.team?70:order==='attack'?650:240;
+    if(target&&distance<=35){if(u.cd<=0){target.hp=Math.max(0,target.hp-(u.team?LEVELS[levelIndex].enemyDamage:RULES.damage));u.cd=RULES.cooldown;}}
+    else if((u.team&&u.x<=82)||(!u.team&&order==='attack'&&u.x>=638)){
+      if(u.cd<=0){if(u.team)baseHP=Math.max(0,baseHP-1);else enemyHP=Math.max(0,enemyHP-RULES.damage);u.cd=RULES.cooldown;}
+    }else{const goal=target&&(u.team||order==='attack'||target.x<320)?target.x:destination;u.x+=Math.sign(goal-u.x)*Math.min(Math.abs(goal-u.x),RULES.speed*dt);}
+  }
+  units=units.filter(u=>u.hp>0);
+  if(baseHP<=0)finish('lost');else if(enemyHP<=0)finish('won');
+}
+// 火柴人 = 圆脑袋 + 身体 + 四肢。x、y 是脚下的位置。
+function stick(x,y,color='#2e4233',step=0,hat=false){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(x,y-47,9,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x,y-36); ctx.lineTo(x,y-17);
+  ctx.moveTo(x-13,y-24); ctx.lineTo(x,y-33); ctx.lineTo(x+13,y-23);
+  ctx.moveTo(x-12-step,y); ctx.lineTo(x,y-17); ctx.lineTo(x+12+step,y); ctx.stroke();
+  if(hat){ctx.fillStyle='#c59742';ctx.fillRect(x-13,y-58,26,6);}
+}
+function field(){ctx.clearRect(0,0,720,240);ctx.fillStyle='#a9c689';ctx.fillRect(0,185,720,55);ctx.fillStyle='#98bba0';ctx.beginPath();ctx.moveTo(0,185);ctx.lineTo(160,45);ctx.lineTo(320,185);ctx.lineTo(510,65);ctx.lineTo(720,185);ctx.fill();}
+
+function show(){
+  $('gold').textContent=gold;$('miners').textContent=miners;$('base').textContent=baseHP;$('enemy').textContent=enemyHP;
+  $('queue').textContent=queue.map(u=>(u.type==='miner'?'矿工':'守卫')+' '+u.remaining.toFixed(1)+'秒').join(' → ')||'兵营空闲';
+  $('state').textContent=({ready:'准备',playing:'进行中',paused:'暂停',won:'胜利',lost:'结束'})[status]+' · '+Math.floor(time)+' 秒 · '+(order==='attack'?'进攻':'防守');
+  $('pause').textContent=status==='paused'?'继续':'暂停';
+}
+function draw(now){field();ctx.fillStyle='#6f8872';ctx.fillRect(25,115,55,70);ctx.fillStyle='#a6765d';ctx.fillRect(640,115,55,70);
+  for(let i=0;i<Math.min(miners,6);i++)stick(100+i*17,205,'#696c37',Math.sin(now/180)*2,true);
+  for(const u of units){stick(u.x,185,u.team?'#995a48':'#345e44',status==='playing'?Math.sin(now/130)*3:0);ctx.fillStyle='#304737';ctx.fillRect(u.x-13,117,26*u.hp/(u.team?7:10),4);}
+}
+function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;update(dt);draw(now);show();requestAnimationFrame(frame);}
+$('miner').onclick=()=>recruit('miner');$('guard').onclick=()=>recruit('guard');
+$('start').onclick=()=>{if(status==='ready'){status='playing';$('message').textContent='军团出发！可以继续招募。';}};
+$('attack').onclick=()=>{order='attack';};$('defend').onclick=()=>{order='defend';};
+$('pause').onclick=()=>{if(status==='playing')status='paused';else if(status==='paused')status='playing';};
+$('reset').onclick=reset;
+if($('level'))$('level').onchange=e=>{levelIndex=Number(e.target.value);$('canvas').style.background=LEVELS[levelIndex].color;reset();};
+reset();requestAnimationFrame(frame);
+
+</script>
+<p><small>小设计师任务：找到 LEVELS 数组，只把雪地的 enemyEvery:9 改成 12。感觉有什么变化？</small></p>
+</main>
+</html>

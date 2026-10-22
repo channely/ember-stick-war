@@ -4,19 +4,20 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#eeece3">
-  <meta name="description" content="集结你的火柴人军团。在余烬王国中采集黄金、训练六种兵种、施放战场技能，征服六大战役。">
+  <meta name="description" content="集结你的火柴人军团。在余烬王国中采集黄金、训练六种兵种、施放战场技能，征服三十个关卡。">
   <title>火柴人战争 · 余烬王国</title>
   <link rel="icon" type="image/svg+xml" href="./assets/crest.svg">
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./classic.css">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="火柴人战争首页"><img src="./assets/crest.svg" width="42" height="44" alt=""><span>火柴人战争<small>STICK WAR · EMBER KINGDOM</small></span></a>
+    <a class="brand" href="./" aria-label="火柴人战争首页"><img src="./assets/crest.svg" width="42" height="44" alt=""><span>火柴人战争<small>EMBER KINGDOM · v0.2.0</small></span></a>
     <nav class="main-nav" aria-label="主导航">
       <button class="nav-button active" data-action="campaign"><span data-icon="flag"></span>战役征途</button>
-      <button class="nav-button" data-action="armory"><span data-icon="swords"></span>军团兵工厂</button>
+      <button class="nav-button" data-action="armory"><span data-icon="swords"></span>军团兵营</button>
       <button class="nav-button" data-action="codex"><span data-icon="book"></span>战争图鉴</button>
-    </nav>
+    <a class="nav-button workshop-link" href="./learn/"><span data-icon="sparkles"></span>亲子工坊</a></nav>
     <div class="header-right"><div class="gem-balance" title="通关战役可获得水晶，用于永久升级"><span data-icon="gem"></span><b id="gems">3</b><span>水晶</span></div><span class="header-divider"></span><button class="icon-button" data-action="settings" aria-label="游戏设置" title="游戏设置"><span data-icon="settings"></span></button></div>
   </header>
 
@@ -34,9 +35,9 @@
       </div>
       <div class="battle-viewport" id="battle-viewport">
         <canvas id="battlefield" tabindex="0" aria-label="战场。拖动移动视野；点击我方单位直接控制；A、D移动，空格攻击。"></canvas>
-        <div class="field-caption"><span class="live-dot"></span><span id="battle-caption">余烬平原</span><span class="field-caption-separator">·</span><span id="weather-caption">晴 · 顺风</span></div>
+        <div class="mission-live"><span data-icon="target"></span><span id="mission-live">摧毁敌方雕像</span><small id="wave-live">准备出征</small></div><div class="field-caption"><span class="live-dot"></span><span id="battle-caption">余烬平原</span><span class="field-caption-separator">·</span><span id="weather-caption">晴 · 顺风</span></div>
         <button class="sound-toggle" data-action="sound" id="sound-button" aria-label="开启音效" title="开启音效"><span data-icon="volume-off"></span></button>
-        <div class="ready-card" id="ready-card"><div class="ready-emblem" data-icon="flag"></div><div><strong>指挥官，你的军团已就绪</strong><p>采集黄金，壮大军队，摧毁敌方雕像。</p></div><button class="primary-button" data-action="start">开始战斗<span data-icon="arrow-right"></span></button></div>
+        <div class="ready-card" id="ready-card"><div class="ready-emblem" data-icon="flag"></div><div><strong>指挥官，你的军团已就绪</strong><p id="ready-copy">采集黄金，壮大军队，摧毁敌方雕像。</p></div><button class="primary-button" data-action="start">开始战斗<span data-icon="arrow-right"></span></button></div>
         <div class="selected-unit hidden" id="selected-unit"></div>
         <div class="battle-message" id="battle-message" aria-live="polite"></div>
         <div class="battle-bottom"><button class="camera-home" data-action="camera-home" title="返回我方基地"><span data-icon="home"></span><span>我方基地</span></button><div class="commands" aria-label="军团指令"><button data-command="garrison" title="驻守（Z）"><span data-icon="home"></span>驻守<kbd>Z</kbd></button><button class="active" data-command="defend" title="防守（X）"><span data-icon="shield"></span>防守<kbd>X</kbd></button><button data-command="attack" title="进攻（C）"><span data-icon="swords"></span>进攻<kbd>C</kbd></button></div><div class="minimap-wrap"><canvas id="minimap" width="174" height="40" tabindex="0" aria-label="战场小地图，点击移动视野"></canvas></div></div>
@@ -50,8 +51,9 @@
       <div class="battle-skills"><div class="section-heading"><h2>战场技能</h2><span class="section-kicker">扭转战局</span></div><div class="skill-grid"><button class="skill-card" id="rage-button" data-skill="rage"><span class="skill-art rage-art" data-icon="flame"></span><span><b>军团狂怒</b><small id="rage-status">伤害 +60% · 12 秒</small></span><kbd>Q</kbd><div class="skill-cooldown"></div></button><button class="skill-card" id="heal-button" data-skill="heal"><span class="skill-art heal-art" data-icon="sparkles"></span><span><b>治愈之光</b><small id="heal-status">全军恢复 45% 生命</small></span><kbd>E</kbd><div class="skill-cooldown"></div></button></div></div>
     </section>
 
-    <section class="journey-section"><div class="objective"><span class="objective-icon" data-icon="flag"></span><div><h3>此战的目标</h3><p>守护秩序雕像，摧毁敌军的信仰。</p></div><span class="objective-chip">征服 <span id="objective-level">1</span> / 6</span></div><div class="campaign-progress" id="campaign-progress"></div><button class="help-link" data-action="help">新任指挥官？<span>查看战争手册 <span data-icon="arrow-right"></span></span></button></section>
-    <footer><span>以自由之名，为秩序而战。</span><span>原创非官方网页版 <i>◆</i> 本地自动存档 <span class="save-dot"></span></span></footer>
+    <section class="supplies-strip" aria-label="战场道具"><div class="supplies-title"><b>战术行囊</b><small id="item-cd">共享冷却 8 秒</small></div><div class="item-grid" id="item-grid"></div><button class="supply-shop" data-action="supplies">补给商店<span data-icon="arrow-right"></span></button></section>
+    <section class="journey-section"><div class="objective"><span class="objective-icon" data-icon="flag"></span><div><h3>此战的目标</h3><p id="objective-copy">守护秩序雕像，摧毁敌军的信仰。</p></div><span class="objective-chip">征服 <span id="objective-level">1</span> / 30</span></div><div class="campaign-progress" id="campaign-progress"></div><button class="help-link" data-action="help">新任指挥官？<span>查看战争手册 <span data-icon="arrow-right"></span></span></button></section>
+    <footer><span>以自由之名，为秩序而战。</span><span><a href="./release/" title="版本说明与全部下载">非官方重制 · v0.2.0</a> <i>◆</i> 本地自动存档 <span class="save-dot"></span></span></footer>
   </main>
   <div class="modal-backdrop hidden" id="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button class="modal-close icon-button" data-action="close-modal" aria-label="关闭窗口"><span data-icon="x"></span></button><div id="modal-content"></div></section></div>
   <div class="toast" id="toast" role="status"></div>

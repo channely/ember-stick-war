@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { Battle, UNITS, WORLD, population } from '../dist/engine.js';
+import { Battle, UNITS, WORLD, LEVELS, population } from '../dist/engine.js';
 
 function advance(battle, seconds, eachSecond) {
   for(let i=0;i<seconds*30 && battle.status==='playing';i++){
@@ -16,13 +16,13 @@ test('miners complete trips and deliver gold rather than crediting it immediatel
 
 test('recruitment spends gold, trains in order, and refunds cancellations',()=>{
   const b=new Battle();assert.ok(b.train('sword').ok);assert.ok(b.train('archer').ok);
-  assert.equal(b.gold,125);assert.equal(b.queue.length,2);assert.equal(population(b.units,b.queue),5);
-  assert.ok(b.cancelTraining(1));assert.equal(b.gold,375);b.start();advance(b,5);
+  assert.equal(b.gold,LEVELS[0].startGold-375);assert.equal(b.queue.length,2);assert.equal(population(b.units,b.queue),5);
+  assert.ok(b.cancelTraining(1));assert.equal(b.gold,LEVELS[0].startGold-125);b.start();advance(b,5);
   assert.equal(b.queue.length,0);assert.equal(b.stats.trained,1);assert.equal(b.units.filter(u=>u.team===0&&u.type==='sword').length,2);
 });
 
 test('insufficient funds, full queues, and population caps reject recruitment without spending',()=>{
-  const b=new Battle();assert.equal(b.train('giant').ok,false);assert.equal(b.gold,500);
+  const b=new Battle();assert.equal(b.train('giant').ok,false);assert.equal(b.gold,LEVELS[0].startGold);
   b.gold=10000;for(let i=0;i<5;i++)assert.ok(b.train('miner').ok);
   const balance=b.gold;assert.equal(b.train('sword').ok,false);assert.equal(b.gold,balance);
   b.queue=[];for(let i=0;i<9;i++)b.spawn('giant',0);
@@ -75,7 +75,7 @@ test('enemy waves can defeat an undefended base and stop the simulation',()=>{
 });
 
 test('all six chapters provide increasing opposition and all unit types can be trained',()=>{
-  let previous=0;for(let level=0;level<6;level++){const b=new Battle({level});assert.ok(b.enemyMax>previous);previous=b.enemyMax;}
+  let previous=0;for(let level=4;level<30;level+=5){const b=new Battle({level});assert.ok(b.enemyMax>previous);previous=b.enemyMax;}
   for(const type of Object.keys(UNITS)){const b=new Battle();b.gold=UNITS[type].cost;assert.ok(b.train(type).ok);b.start();advance(b,UNITS[type].train+.2);assert.equal(b.stats.trained,1);assert.ok(b.units.some(u=>u.team===0&&u.type===type));}
 });
 
