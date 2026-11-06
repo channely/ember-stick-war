@@ -3,8 +3,9 @@ let manifest=[],original='',loadedLesson=0,loadSerial=0;
 const PROGRESS='ember-workshop-v1',JOURNAL='ember-workshop-journal-v1';
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
 function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));return true;}catch{return false;}}
-const done=new Set(read(PROGRESS,[]));
-function updateProgress(){document.querySelectorAll('[data-done]').forEach(el=>{el.checked=done.has(Number(el.dataset.done));});document.querySelectorAll('[data-lesson-link]').forEach(el=>el.classList.toggle('done',done.has(Number(el.dataset.lessonLink))));$('completed').textContent=done.size;$('progress-bar').style.width=(done.size/12*100)+'%';}
+const storedProgress=read(PROGRESS,[]);
+const done=new Set((Array.isArray(storedProgress)?storedProgress:[]).filter(n=>Number.isInteger(n)&&n>=1&&n<=15));
+function updateProgress(){document.querySelectorAll('[data-done]').forEach(el=>{el.checked=done.has(Number(el.dataset.done));});document.querySelectorAll('[data-lesson-link]').forEach(el=>el.classList.toggle('done',done.has(Number(el.dataset.lessonLink))));$('completed').textContent=done.size;$('progress-bar').style.width=(done.size/15*100)+'%';}
 document.querySelectorAll('[data-done]').forEach(el=>el.addEventListener('change',()=>{const n=Number(el.dataset.done);if(el.checked)done.add(n);else done.delete(n);write(PROGRESS,[...done]);updateProgress();}));updateProgress();
 function run(){const source=$('source').value;$('preview').srcdoc=source;$('editor-status').textContent='已运行当前代码；重新打开此课会恢复示例。';}
 function download(content,name,type='text/plain;charset=utf-8'){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}

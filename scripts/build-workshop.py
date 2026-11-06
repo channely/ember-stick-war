@@ -1,18 +1,19 @@
 """Render the curriculum. Development dependency: python -m pip install Markdown."""
 from pathlib import Path
-import re,json,html
+import re,json,html,sys
+VERSION=sys.argv[1] if len(sys.argv)>1 else json.loads((Path(__file__).resolve().parents[1]/'package.json').read_text())['version']
 import markdown
 ROOT=Path(__file__).resolve().parents[1]
 base=ROOT/'dist/learn'
 text=(ROOT/'docs/亲子游戏制作教程.md').read_text()
 manifest=json.loads((base/'examples/manifest.json').read_text())
-text=text.replace('`art.js`：把世界画出来','`art-v2.js` 与 `art.js`：把世界画出来').replace('关卡／内容数据文件：','`content.js`：')
-(ROOT/'docs/亲子游戏制作教程.md').write_text(text)
-short=['豆子和兵营','四个记事盒','钱够不够','画一个伙伴','画面动起来','矿工任务卡','训练小火车','公平地挥剑','开始与结束','三张新地图','游戏侦探','家庭发布会']
+short=['豆子和兵营','四个记事盒','钱够不够','画一个伙伴','画面动起来','矿工任务卡','训练小火车','公平地挥剑','开始与结束','三张新地图','游戏侦探','家庭发布会','黄金的回家路','挥剑的三拍','伙伴的配合']
 sections=[]
 for i,part in enumerate(re.split(r'^## ',text,flags=re.M)):
  if not part.strip() or i==0:continue
  title=part.split('\n')[0];m=re.match(r'第 (\d+) 次',title)
+ advanced=re.match(r'进阶实验 ([ABC])',title)
+ if advanced:m=re.match(r'(\d+)',str(13+ord(advanced.group(1))-ord('A')))
  anchor='lesson-'+m.group(1) if m else ('setup' if title.startswith('家长先准备') else 'reading-'+str(i))
  content=markdown.markdown(('## ' if i else '')+part,extensions=['tables','fenced_code'])
  if m:
@@ -24,13 +25,13 @@ nav=''.join(f'<a href="#lesson-{i+1}" data-lesson-link="{i+1}"><span>{i+1:02}</s
 options=''.join(f'<option value="{m["lesson"]}">{m["title"]}</option>' for m in manifest)
 page=f'''<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f2e9"><title>亲子游戏工坊 · 和孩子一起造一座火柴人王国</title><meta name="description" content="给二年级孩子和家长的12次游戏制作探险。纸上规则、可运行示例、代码实验、打印卡片与完整教程。"><link rel="icon" href="../assets/crest.svg"><link rel="stylesheet" href="./workshop.css"></head><body>
 <header><a class="brand" href="./"><img src="../assets/crest.svg" alt=""><span>亲子游戏工坊<small>MAKE A LITTLE WORLD TOGETHER</small></span></a><a class="back-game" href="../">返回余烬王国 <span>↗</span></a></header>
-<div class="hero"><div><div class="eyebrow">给小设计师的第一张地图</div><h1>和孩子一起，<br>造一座<em>火柴人王国。</em></h1><p>从四颗金币豆子开始，发现游戏背后的规则。<br>你陪他把想法变成画面，他带你重新发现创造的乐趣。</p><div class="hero-actions"><a class="button primary" href="#lesson-1">从第一课出发 <span>→</span></a><a class="button" href="./downloads/ember-family-kit-0.2.0.zip" download>下载完整材料包 <span>↓</span></a></div><div class="hero-tags"><span>◇ 适合二年级</span><span>◇ 12 次小探险</span><span>◇ 每次 20–30 分钟</span></div></div><div class="hero-art">{svg}<div class="art-label">一个想法 · 一条规则 · 一个自己的世界</div></div></div>
+<div class="hero"><div><div class="eyebrow">给小设计师的第一张地图</div><h1>和孩子一起，<br>造一座<em>火柴人王国。</em></h1><p>从四颗金币豆子开始，发现游戏背后的规则。<br>你陪他把想法变成画面，他带你重新发现创造的乐趣。</p><div class="hero-actions"><a class="button primary" href="#lesson-1">从第一课出发 <span>→</span></a><a class="button" href="./downloads/ember-family-kit-{VERSION}.zip" download>下载完整材料包 <span>↓</span></a></div><div class="hero-tags"><span>◇ 适合二年级</span><span>◇ 12 课 + 3 个实验</span><span>◇ 每次 20–30 分钟</span></div></div><div class="hero-art">{svg}<div class="art-label">一个想法 · 一条规则 · 一个自己的世界</div></div></div>
 <div class="quick-start"><div><h2>今天，先做三件事。</h2><small>不急着学会全部代码</small></div><div><b><strong>01</strong>先猜一猜</b><p>如果先买一个矿工，下一回合会多几颗黄金？</p></div><div><b><strong>02</strong>亲手改一处</b><p>孩子决定颜色和数字，家长帮助把想法写下来。</p></div><div><b><strong>03</strong>看看为什么</b><p>猜错也是发现。用一次试验，认识一条新规则。</p></div></div>
-<div class="layout"><aside class="sidebar"><span class="side-label">YOUR EXPLORATION MAP</span><h3>我们的探险 <span id="completed">0</span> / 12</h3><div class="progress-track"><i id="progress-bar"></i></div><nav><a href="#studio">✧ 动手实验台</a><a href="#setup">↗ 家长准备指南</a>{nav}<a href="#notebook">✎ 小设计师日记</a></nav><div class="side-download"><a href="./downloads/parent-child-guide-0.2.0.pdf" download>↓ 完整教程 PDF</a><a href="./downloads/parent-child-guide-0.2.0.md" download>↓ 可编辑 Markdown 教程</a><a href="./cards.html" target="_blank" rel="noopener">↗ 打印规则卡与测试卡</a><a href="./downloads/ember-family-kit-0.2.0.zip" download>↓ 12 个作品 + 教程材料包</a></div></aside>
+<div class="layout"><aside class="sidebar"><span class="side-label">YOUR EXPLORATION MAP</span><h3>我们的探险 <span id="completed">0</span> / 15</h3><div class="progress-track"><i id="progress-bar"></i></div><nav><a href="#studio">✧ 动手实验台</a><a href="#setup">↗ 家长准备指南</a>{nav}<a href="#notebook">✎ 小设计师日记</a></nav><div class="side-download"><a href="./downloads/parent-child-guide-{VERSION}.pdf" download>↓ 完整教程 PDF</a><a href="./downloads/parent-child-guide-{VERSION}.md" download>↓ 可编辑 Markdown 教程</a><a href="./cards.html" target="_blank" rel="noopener">↗ 打印规则卡与测试卡</a><a href="./downloads/ember-family-kit-{VERSION}.zip" download>↓ 15 个作品 + 教程材料包</a></div></aside>
 <main class="content"><section class="studio" id="studio"><div class="studio-head"><div><h2>小小实验台</h2><small>改一条规则，看看世界怎么回应。</small></div><select id="example-select" aria-label="选择学习示例">{options}</select></div><div class="studio-caption" id="lab-task">先从纸上规则开始。</div><iframe id="preview" sandbox="allow-scripts" title="小设计师作品运行预览"></iframe><div class="studio-tools"><button class="button" id="restart-example">重新运行</button><button class="button" id="save-code">下载我的作品 ↓</button><a id="open-example" href="./examples/01-rules.html" target="_blank" rel="noopener">在新窗口玩 ↗</a></div><details class="editor"><summary>看代码，改一处 · 家长陪同</summary><p>先在文件里找到一个想改的数字。一次只改一处，然后按运行。预览重启会清空这一局。</p><textarea id="source" aria-label="作品 HTML 代码" spellcheck="false"></textarea><div class="editor-buttons"><button class="button primary" id="run-code">运行我的代码</button><button class="button" id="restore-code">恢复示例</button></div><span class="editor-status" id="editor-status" aria-live="polite">正在准备示例…</span></details></section>
-<article class="reading"><div class="print-cover"><h1>和孩子一起造一座火柴人王国</h1><p>12 次亲子游戏制作探险 · v0.2.0 · 2026-10-22</p><p>配套在线工坊： https://ember-stick-war.channely.chatgpt.site/learn/</p><p>材料包内包含 12 个可直接打开的 HTML 作品、完整教程与打印卡片。游戏及课程以原创素材制作，是非官方同类玩法教学项目。</p></div>{''.join(sections)}</article>
+<article class="reading"><div class="print-cover"><h1>和孩子一起造一座火柴人王国</h1><p>12 次探险 + 3 个进阶实验 · v{VERSION} · 2026-11-06</p><p>配套在线工坊： https://ember-stick-war.channely.chatgpt.site/learn/</p><p>材料包内包含 15 个可直接打开的 HTML 作品、完整教程与打印卡片。游戏及课程以原创素材制作，是非官方同类玩法教学项目。</p></div>{''.join(sections)}</article>
 <section class="notebook" id="notebook"><h2>小设计师日记</h2><p>可以由孩子讲，家长记录。每次留下一句话，就有了一条创作的足迹。</p><textarea id="journal" aria-label="小设计师日记"></textarea><button id="save-journal" class="button">下载我的日记 ↓</button><small id="journal-status">仅保存在当前浏览器，建议每次下载一份。</small></section><p class="download-note">开始日期由你们决定。完成标记是自己的记录，不是考试分数。</p></main></div>
-<footer class="footer"><span>先猜，再试，最后说一说。</span><span>余烬王国 · 亲子工坊 v0.2.0 · 原创教学材料</span></footer><script type="module" src="./workshop.js"></script></body></html>'''
+<footer class="footer"><span>先猜，再试，最后说一说。</span><span>余烬王国 · 亲子工坊 v{VERSION} · 原创教学材料</span></footer><script type="module" src="./workshop.js"></script></body></html>'''
 (base/'index.html').write_text(page)
-(base/'downloads/parent-child-guide-0.2.0.md').write_text(text)
+(base/f'downloads/parent-child-guide-{VERSION}.md').write_text(text)
 print('Workshop generated')

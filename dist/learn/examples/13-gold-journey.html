@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>进阶实验 A · 黄金的回家路</title><style>
+*{box-sizing:border-box}body{margin:0;padding:20px;background:#f7f2e6;color:#304b38;font:15px/1.7 system-ui,sans-serif}main{max-width:760px;margin:auto}h1{font-size:25px;margin:0 0 5px}p{margin:8px 0}small{color:#64775d}.stats,.tools{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}.stats span{background:#e5ebd6;padding:8px 12px;border-radius:7px}button,select{font:inherit;border:1px solid #a5b58e;background:#e8eddb;color:#304b38;padding:9px 14px;border-radius:6px;cursor:pointer}button:disabled{opacity:.5;cursor:default}button:focus-visible,select:focus-visible{outline:3px solid #b88e30;outline-offset:3px}canvas{width:100%;height:auto;background:#e5edd7;border:1px solid #bbc8a6;border-radius:10px;display:block}output{display:block;min-height:56px;background:#fffaf0;padding:12px;border-left:4px solid #bd9a4d}details{margin:16px 0}code{background:#e5ebd6;padding:2px 5px}li{margin:6px 0}@media(max-width:420px){body{padding:13px}h1{font-size:21px}.stats{gap:5px}.stats span{padding:5px 7px;font-size:13px}}
+</style></head><body><main><small>0.3.0 进阶实验 A · 先猜 → 再试 → 解释</small><h1>黄金进了背包，仓库就有钱了吗？</h1><p>矿山一共有 <b>12</b> 颗黄金。让矿工亲手走完一次回家路。</p>
+<div class="stats"><span>矿山 <b id="ore">12</b></span><span>背包 <b id="bag">0</b></span><span>仓库 <b id="bank">0</b></span><span>任务：<b id="phase">去矿山</b></span></div>
+<canvas id="world" width="720" height="230" aria-label="矿工在左侧仓库与右侧矿山之间搬运黄金"></canvas>
+<div class="tools"><button id="step">走一小步</button><button id="auto">自动演示</button><button id="return">提前带回家</button><button id="reset">重新开始</button><label>背包容量 <select id="capacity"><option>3</option><option>2</option><option>6</option></select></label></div>
+<output id="message" aria-live="polite">先预测：矿工刚挖出第一颗黄金时，哪个数字会增加？</output>
+<p id="conservation">矿山 12 ＋ 背包 0 ＋ 仓库 0 ＝ 12</p>
+<details open><summary>今天只改一条规则</summary><ol><li>先按「走一小步」，观察去矿山、开采、回家、交金四张任务卡。</li><li>装满背包后暂停：仓库现在有多少？回家后是哪一步改变了它？</li><li>改变背包容量会重新开始。容量变大后，搬完 12 颗黄金会需要更少步数吗？先猜再比。</li></ol><p><b>对应正式游戏：</b>黄金先进入矿袋，运回才入账；矿山会耗尽。这个小模型用格子与回合代替正式游戏的连续移动，没有敌人和训练队列。</p><p>家长代码纸条：找到 <code>const TOTAL_GOLD = 12</code>，一次只改这一个数字，再检查三个盒子的总和。</p></details>
+<p><small>每次 20–30 分钟即可。孩子决定预测与改动，家长帮助保存文件。完成后请讲一句：“因为……所以……”。</small></p></main>
+<script>
+const TOTAL_GOLD = 12;
+const MINE_X = 6;
+const $=id=>document.getElementById(id),ctx=$('world').getContext('2d');
+let ore,bag,bank,x,phase,steps,capacity,timer=null;
+const names={out:'去矿山',dig:'开采',back:'回家',deposit:'交金',done:'搬完了'};
+function stop(){clearInterval(timer);timer=null;$('auto').textContent='自动演示';}
+function reset(){stop();ore=TOTAL_GOLD;bag=0;bank=0;x=0;phase='out';steps=0;capacity=Number($('capacity').value);$('message').textContent='新实验开始。先猜一猜：第一颗黄金会进入哪个盒子？';draw();}
+function step(){if(phase==='done')return;steps++;let message='';
+ if(phase==='out'){x=Math.min(MINE_X,x+1);if(x===MINE_X)phase='dig';message='正在去矿山，仓库还没有收到黄金。';}
+ else if(phase==='dig'){const amount=Math.min(1,ore,capacity-bag);ore-=amount;bag+=amount;message='挖出的黄金装进了背包，还没有进入仓库。';if(bag>=capacity||ore===0)phase=bag?'back':'done';}
+ else if(phase==='back'){x=Math.max(0,x-1);message='背着黄金回家，背包中的黄金仍不算仓库的钱。';if(x===0)phase='deposit';}
+ else if(phase==='deposit'){const delivered=bag;bank+=delivered;bag=0;phase=ore>0?'out':'done';message='交金完成：仓库增加 '+delivered+'，背包变成 0。';}
+ if(phase==='done'){stop();message='搬完了！一共 '+steps+' 步。三个盒子的总和仍是 '+TOTAL_GOLD+'。';}
+ $('message').textContent=message;draw();
+}
+function draw(){for(const [id,value] of Object.entries({ore,bag,bank,phase:names[phase]}))$(id).textContent=value;$('step').disabled=phase==='done';$('auto').disabled=phase==='done';$('return').disabled=bag===0||phase==='back'||phase==='deposit'||phase==='done';$('conservation').textContent=`矿山 ${ore} ＋ 背包 ${bag} ＋ 仓库 ${bank} ＝ ${ore+bag+bank}　｜　第 ${steps} 步`;
+ ctx.clearRect(0,0,720,230);ctx.fillStyle='#cbdcb3';ctx.fillRect(0,165,720,65);ctx.strokeStyle='#a0b382';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(60,167);ctx.lineTo(660,167);ctx.stroke();
+ for(let i=0;i<=MINE_X;i++){ctx.fillStyle='#9cae80';ctx.beginPath();ctx.arc(90+i*90,167,4,0,Math.PI*2);ctx.fill();}
+ ctx.fillStyle='#899d6f';ctx.fillRect(42,91,75,74);ctx.beginPath();ctx.moveTo(32,91);ctx.lineTo(80,54);ctx.lineTo(127,91);ctx.fill();ctx.fillStyle='#b99d54';ctx.beginPath();ctx.moveTo(590,163);ctx.lineTo(622,94);ctx.lineTo(678,163);ctx.fill();ctx.font='16px system-ui';ctx.textAlign='center';ctx.fillStyle='#405b3f';ctx.fillText('仓库',80,205);ctx.fillText('有限矿山',630,205);
+ const px=90+x*90;ctx.strokeStyle='#304a36';ctx.lineWidth=6;ctx.lineCap='round';ctx.beginPath();ctx.arc(px,112,10,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(px,124);ctx.lineTo(px,146);ctx.lineTo(px-10,165);ctx.moveTo(px,146);ctx.lineTo(px+10,165);ctx.moveTo(px-12,139);ctx.lineTo(px,130);ctx.lineTo(px+16,137);ctx.stroke();if(bag){ctx.fillStyle='#d6b451';ctx.fillRect(px-23,124,13,18);ctx.fillStyle='#304a36';ctx.font='13px system-ui';ctx.fillText(bag,px-17,118);}ctx.fillStyle='#304a36';ctx.font='17px system-ui';ctx.fillText(names[phase],360,34);
+}
+$('step').onclick=step;$('reset').onclick=reset;$('capacity').onchange=reset;$('auto').onclick=()=>{if(timer)stop();else{timer=setInterval(step,600);$('auto').textContent='暂停演示';}};$('return').onclick=()=>{if(bag>0){phase='back';$('message').textContent='接到新任务：带着已有黄金回家。背包里的黄金没有丢失。';draw();}};
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+window.workshopState=()=>({ore,bag,bank,x,phase,steps,capacity,total:TOTAL_GOLD});reset();
+</script></body></html>

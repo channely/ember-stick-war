@@ -206,5 +206,8 @@ document.getElementById('test').onclick=()=>{
 ''','试着口头解释：价格前一个数、价格本身、价格后一个数，为什么都要测试？')
 page(12,'our-kingdom','12 · 我们的火柴人王国 v1','给这个作品起一个新名字，选择一条规则修改，邀请一位家人试玩。规则仍在源码的设计区。','<label>关卡 <select id="level"><option value="0">草地 · 学会积攒</option><option value="1">沙地 · 保护矿工</option><option value="2">雪地 · 先守再攻</option></select></label>'+BODY,MINIGAME,'修改页面 h1 中的王国名字，在设计师日记里写下：我改了什么、为什么、怎样验证。')
 import json
-(OUT/'manifest.json').write_text(json.dumps([{'lesson':n,'file':f,'title':t,'task':c} for n,f,t,c in examples],ensure_ascii=False,indent=2))
-print(f'Built {len(examples)} self-contained examples')
+advanced=json.loads((OUT/'advanced-manifest.json').read_text())
+for item in advanced:
+ assert (OUT/item['file']).is_file(), f"Missing advanced lesson: {item['file']}"
+(OUT/'manifest.json').write_text(json.dumps([{'lesson':n,'file':f,'title':t,'task':c} for n,f,t,c in examples]+advanced,ensure_ascii=False,indent=2)+'\n')
+print(f'Built {len(examples)} introductory examples; retained {len(advanced)} advanced experiments')

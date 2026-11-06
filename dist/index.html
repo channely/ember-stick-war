@@ -2,58 +2,58 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#eeece3">
-  <meta name="description" content="集结你的火柴人军团。在余烬王国中采集黄金、训练六种兵种、施放战场技能，征服三十个关卡。">
-  <title>火柴人战争 · 余烬王国</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#263321">
+  <meta name="description" content="采矿、混编军团、接管六种战士。余烬王国 0.3.0：三十场经典战役、双端操控和亲子练习。">
+  <title>火柴人战争 · 余烬王国 0.3.0</title>
   <link rel="icon" type="image/svg+xml" href="./assets/crest.svg">
   <link rel="stylesheet" href="./style.css">
   <link rel="stylesheet" href="./classic.css">
+  <link rel="stylesheet" href="./ui-v3.css">
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="./" aria-label="火柴人战争首页"><img src="./assets/crest.svg" width="42" height="44" alt=""><span>火柴人战争<small>EMBER KINGDOM · v0.2.0</small></span></a>
-    <nav class="main-nav" aria-label="主导航">
-      <button class="nav-button active" data-action="campaign"><span data-icon="flag"></span>战役征途</button>
-      <button class="nav-button" data-action="armory"><span data-icon="swords"></span>军团兵营</button>
-      <button class="nav-button" data-action="codex"><span data-icon="book"></span>战争图鉴</button>
-    <a class="nav-button workshop-link" href="./learn/"><span data-icon="sparkles"></span>亲子工坊</a></nav>
-    <div class="header-right"><div class="gem-balance" title="通关战役可获得水晶，用于永久升级"><span data-icon="gem"></span><b id="gems">3</b><span>水晶</span></div><span class="header-divider"></span><button class="icon-button" data-action="settings" aria-label="游戏设置" title="游戏设置"><span data-icon="settings"></span></button></div>
+    <a class="brand" href="./" aria-label="余烬王国首页"><img src="./assets/crest.svg" width="32" height="34" alt=""><span>余烬王国<small>EMBER KINGDOM · v0.3.0</small></span></a>
+    <nav class="main-nav" aria-label="营地导航">
+      <button class="nav-button" data-action="campaign" title="30关战役地图"><span data-icon="flag"></span><span>战役</span></button>
+      <button class="nav-button" data-action="armory" title="兵器升级、皮肤与法术"><span data-icon="swords"></span><span>营地</span></button>
+      <button class="nav-button" data-action="practice" title="六兵种练习场"><span data-icon="target"></span><span>练习</span></button>
+      <a class="nav-button workshop-link" href="./learn/" title="亲子制作工坊"><span data-icon="book"></span><span>工坊</span></a>
+    </nav>
+    <div class="header-right"><button class="family-toggle" id="family-button" data-action="family" aria-pressed="false" title="亲子辅助：半速与暂停下令">亲子辅助</button><button class="gem-balance" data-action="armory" title="宝石用于皮肤与法术；升级点用于兵器"><span data-icon="gem"></span><b id="gems">3</b></button><button class="icon-button" data-action="settings" aria-label="设置与操作帮助"><span data-icon="settings"></span></button></div>
   </header>
-
   <main class="shell">
     <section class="mission-heading" aria-label="当前战役">
-      <div><div class="eyebrow"><span class="little-line"></span>秩序的崛起 <span class="eyebrow-divider">/</span> 战役 <span id="level-index">01</span></div><h1 id="level-title">余烬平原<span class="title-dot">.</span></h1><p id="level-subtitle">在尘土中建立军团，让自由的旗帜再次飘扬。</p></div>
-      <div class="mission-heading-right"><div class="difficulty"><span class="status-dot"></span><span id="difficulty-label">标准难度</span><button data-action="settings" aria-label="更改难度"><span data-icon="chevron-down"></span></button></div><button class="secondary-button" data-action="campaign"><span data-icon="map"></span>战役地图<span data-icon="arrow-up-right"></span></button></div>
+      <div class="mission-title"><span class="mission-number" id="level-index">01</span><h1 id="level-title">第一面旗帜</h1><p id="level-subtitle">建立经济，集结军团。</p></div>
+      <div class="mission-heading-right"><span id="difficulty-label">标准难度</span><span class="mode-badge" id="mode-label">标准战役</span><button class="return-battle-button hidden" id="return-campaign-button" data-action="return-campaign">返回原战局 ↩</button><button class="text-button" data-action="campaign">战役地图 ↗</button></div>
     </section>
-
     <section class="battle-shell" id="battle-shell" aria-label="实时战场">
       <div class="battle-topbar">
-        <div class="battle-resources"><div class="gold-resource"><span data-icon="coins"></span><b id="gold">500</b><span>黄金</span></div><div class="population"><span data-icon="users"></span><b id="population">3</b><span>/ 40</span></div></div>
-        <div class="statue-status"><div class="statue-team"><span>秩序雕像</span><div class="health-track"><i id="ally-health"></i></div><small id="ally-hp">1,500</small></div><span class="versus">VS</span><div class="statue-team enemy-team"><span>敌方雕像</span><div class="health-track"><i id="enemy-health"></i></div><small id="enemy-hp">1,200</small></div></div>
-        <div class="battle-actions"><time id="timer">00:00</time><button id="speed-button" data-action="speed" title="切换游戏速度">1×</button><button class="battle-icon" data-action="pause" id="pause-button" aria-label="暂停游戏" title="暂停 P"><span data-icon="pause"></span></button><button class="battle-icon" data-action="fullscreen" aria-label="全屏战斗" title="全屏"><span data-icon="maximize"></span></button></div>
+        <div class="battle-resources"><div class="gold-resource"><span data-icon="coins"></span><b id="gold">500</b><span>黄金</span></div><div class="population" title="已占用人口，包括训练队列"><span data-icon="users"></span><b id="population">3</b><span>/ <span id="population-cap">50</span></span></div></div>
+        <div class="statue-status"><div class="statue-team"><span>我方雕像</span><div class="health-track"><i id="ally-health"></i></div><small id="ally-hp">1,500</small></div><span class="versus">⚔</span><div class="statue-team enemy-team"><span>敌方雕像</span><div class="health-track"><i id="enemy-health"></i></div><small id="enemy-hp">1,200</small></div></div>
+        <div class="battle-actions"><time id="timer">00:00</time><button id="speed-button" data-action="speed" title="亲子辅助支持半速；标准战役固定1倍速">1×</button><button class="battle-icon" data-action="pause" id="pause-button" aria-label="暂停游戏" title="暂停 P"><span data-icon="pause"></span></button><button class="battle-icon fullscreen-button" data-action="fullscreen" aria-label="全屏战斗"><span data-icon="maximize"></span></button></div>
       </div>
       <div class="battle-viewport" id="battle-viewport">
-        <canvas id="battlefield" tabindex="0" aria-label="战场。拖动移动视野；点击我方单位直接控制；A、D移动，空格攻击。"></canvas>
-        <div class="mission-live"><span data-icon="target"></span><span id="mission-live">摧毁敌方雕像</span><small id="wave-live">准备出征</small></div><div class="field-caption"><span class="live-dot"></span><span id="battle-caption">余烬平原</span><span class="field-caption-separator">·</span><span id="weather-caption">晴 · 顺风</span></div>
-        <button class="sound-toggle" data-action="sound" id="sound-button" aria-label="开启音效" title="开启音效"><span data-icon="volume-off"></span></button>
-        <div class="ready-card" id="ready-card"><div class="ready-emblem" data-icon="flag"></div><div><strong>指挥官，你的军团已就绪</strong><p id="ready-copy">采集黄金，壮大军队，摧毁敌方雕像。</p></div><button class="primary-button" data-action="start">开始战斗<span data-icon="arrow-right"></span></button></div>
-        <div class="selected-unit hidden" id="selected-unit"></div>
+        <canvas id="battlefield" tabindex="0" aria-label="战场。点击我方单位接管，WASD移动，空格攻击，Q副动作，E特殊动作；R切换单位。"></canvas>
+        <div class="field-caption"><span class="live-dot"></span><span id="battle-caption">秩序平原</span><span id="weather-caption">晴空</span></div>
+        <div class="mission-live"><span data-icon="target"></span><span id="mission-live">摧毁敌方雕像</span><small id="wave-live">准备出征</small></div>
+        <button class="sound-toggle" data-action="sound" id="sound-button" aria-label="开启音效"><span data-icon="volume-off"></span></button>
+        <div class="ready-card" id="ready-card"><div class="ready-emblem" data-icon="flag"></div><div><strong id="ready-title">指挥官，你的军团已就绪</strong><p id="ready-copy">采集黄金，壮大军队，摧毁敌方雕像。</p></div><button class="primary-button" data-action="start">开始战斗<span data-icon="arrow-right"></span></button></div>
+        <div class="selected-unit hidden" id="selected-unit"><div><strong id="selected-name"></strong><span id="selected-health"></span><span id="selected-state"></span></div><p id="selected-hint"></p><button data-action="release">交还指挥 <kbd>Esc</kbd></button></div>
         <div class="battle-message" id="battle-message" aria-live="polite"></div>
-        <div class="battle-bottom"><button class="camera-home" data-action="camera-home" title="返回我方基地"><span data-icon="home"></span><span>我方基地</span></button><div class="commands" aria-label="军团指令"><button data-command="garrison" title="驻守（Z）"><span data-icon="home"></span>驻守<kbd>Z</kbd></button><button class="active" data-command="defend" title="防守（X）"><span data-icon="shield"></span>防守<kbd>X</kbd></button><button data-command="attack" title="进攻（C）"><span data-icon="swords"></span>进攻<kbd>C</kbd></button></div><div class="minimap-wrap"><canvas id="minimap" width="174" height="40" tabindex="0" aria-label="战场小地图，点击移动视野"></canvas></div></div>
-        <div class="pause-cover hidden" id="pause-cover"><span data-icon="pause"></span><h2>战场已暂停</h2><p>每一次沉着，都为下一次进攻蓄力。</p><button class="primary-button" data-action="pause">继续战斗<span data-icon="play"></span></button></div>
+        <div class="touch-controls hidden" id="touch-controls" aria-label="单兵控制">
+          <div class="move-stick" id="move-stick" role="group" aria-label="移动摇杆，上下左右移动"><span class="stick-guide">W A S D</span><span id="stick-knob"></span></div>
+          <div class="unit-actions"><button class="manual-button secondary-action" data-manual="secondary" id="secondary-action" aria-pressed="false"><kbd>Q</kbd><b>格挡</b><small></small></button><button class="manual-button special-action" data-manual="special" id="special-action" aria-pressed="false"><kbd>E</kbd><b>跳斩</b><small></small></button><button class="manual-button primary-action" data-manual="attack" id="primary-action" aria-pressed="false"><kbd>Space</kbd><b>攻击</b><small>按住</small></button></div>
+        </div>
+        <div class="pause-cover hidden" id="pause-cover"><span data-icon="pause"></span><h2>战场已暂停</h2><p id="pause-copy">准备好后，继续战斗。</p><button class="primary-button" data-action="pause">继续战斗<span data-icon="play"></span></button></div>
       </div>
-      <div class="battle-statusbar"><span><span class="small-status-dot"></span><span id="order-status">军团正在防守</span></span><span id="control-hint">拖动战场移动视野 <span class="hint-divider">·</span> 点击单位可直接控制</span><button data-action="help"><span data-icon="help"></span>操作指南</button></div>
+      <div class="battle-bottom"><button class="camera-home" data-action="camera-home" title="返回我方基地"><span data-icon="home"></span><span>基地</span></button><div class="commands" aria-label="军团指令"><button data-command="garrison" title="驻守（Z）"><span data-icon="home"></span>驻守<kbd>Z</kbd></button><button class="active" data-command="defend" title="防守（X）"><span data-icon="shield"></span>防守<kbd>X</kbd></button><button data-command="attack" title="进攻（C）"><span data-icon="swords"></span>进攻<kbd>C</kbd></button></div><div class="minimap-wrap"><canvas id="minimap" width="174" height="40" tabindex="0" aria-label="小地图，点击或方向键移动视野"></canvas></div><button class="queue-indicator" id="queue-indicator" data-action="queue" title="查看队列、取消训练">队列 <b>0 / 5</b></button></div>
+      <div class="battle-statusbar"><span id="order-status">军团正在防守</span><span id="control-hint">点击我方单位亲自控制 · 拖动查看战场</span><button data-action="help"><span data-icon="help"></span>操作</button></div>
     </section>
-
-    <section class="recruitment-section" aria-label="训练军队和战场技能">
-      <div class="recruitment"><div class="section-heading"><h2>集结军团 <span>MUSTER YOUR ARMY</span></h2><button class="queue-indicator" id="queue-indicator" title="管理训练队列">训练队列 <b>0 / 5</b></button></div><div class="unit-grid" id="unit-grid"></div></div>
-      <div class="battle-skills"><div class="section-heading"><h2>战场技能</h2><span class="section-kicker">扭转战局</span></div><div class="skill-grid"><button class="skill-card" id="rage-button" data-skill="rage"><span class="skill-art rage-art" data-icon="flame"></span><span><b>军团狂怒</b><small id="rage-status">伤害 +60% · 12 秒</small></span><kbd>Q</kbd><div class="skill-cooldown"></div></button><button class="skill-card" id="heal-button" data-skill="heal"><span class="skill-art heal-art" data-icon="sparkles"></span><span><b>治愈之光</b><small id="heal-status">全军恢复 45% 生命</small></span><kbd>E</kbd><div class="skill-cooldown"></div></button></div></div>
-    </section>
-
-    <section class="supplies-strip" aria-label="战场道具"><div class="supplies-title"><b>战术行囊</b><small id="item-cd">共享冷却 8 秒</small></div><div class="item-grid" id="item-grid"></div><button class="supply-shop" data-action="supplies">补给商店<span data-icon="arrow-right"></span></button></section>
-    <section class="journey-section"><div class="objective"><span class="objective-icon" data-icon="flag"></span><div><h3>此战的目标</h3><p id="objective-copy">守护秩序雕像，摧毁敌军的信仰。</p></div><span class="objective-chip">征服 <span id="objective-level">1</span> / 30</span></div><div class="campaign-progress" id="campaign-progress"></div><button class="help-link" data-action="help">新任指挥官？<span>查看战争手册 <span data-icon="arrow-right"></span></span></button></section>
-    <footer><span>以自由之名，为秩序而战。</span><span><a href="./release/" title="版本说明与全部下载">非官方重制 · v0.2.0</a> <i>◆</i> 本地自动存档 <span class="save-dot"></span></span></footer>
+    <section class="recruitment-section" aria-label="招募军队"><div class="unit-grid" id="unit-grid"></div></section>
+    <section class="supplies-strip" aria-label="战场法术"><div class="supplies-title"><b>法术行囊</b><small id="item-cd">准备就绪</small></div><div class="item-grid" id="item-grid"></div><button class="supply-shop" data-action="supplies" title="使用宝石兑换法术">补给<span data-icon="arrow-right"></span></button></section>
+    <div class="family-coach hidden" id="family-coach" aria-live="polite"><span>一起想一想</span><p id="coach-copy"></p><button data-action="coach-next" aria-label="换一个思考提示">↻</button></div>
+    <footer><span>非官方原创重制 · <a href="./release/">v0.3.0</a></span><span id="save-status">本地自动存档</span></footer>
   </main>
   <div class="modal-backdrop hidden" id="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button class="modal-close icon-button" data-action="close-modal" aria-label="关闭窗口"><span data-icon="x"></span></button><div id="modal-content"></div></section></div>
   <div class="toast" id="toast" role="status"></div>
