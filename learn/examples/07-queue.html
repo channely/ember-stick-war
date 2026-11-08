@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>07 · 兵营里的小火车</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:24px;background:#f7f2e6;color:#293b32;font:16px/1.65 system-ui,sans-serif}main{max-width:760px;margin:auto}h1{font-size:24px;margin:0 0 8px}p{margin:9px 0;color:#657362}button,select,input{font:inherit}button{background:#426a4d;color:#fff6df;border:0;border-radius:7px;padding:10px 17px;cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.4;cursor:default}button.secondary{background:#e5decb;color:#52634c}label{display:inline-flex;align-items:center;gap:10px;margin:8px 16px 8px 0}canvas{display:block;width:100%;background:#d9ebd0;border:1px solid #b6c8aa;border-radius:12px;margin:15px 0}.board{background:#fffdf4;border:1px solid #ddd6bf;border-radius:10px;padding:18px;margin:15px 0}.numbers{display:flex;gap:14px;flex-wrap:wrap}.number{background:#ece4c8;padding:10px 16px;border-radius:8px}.number b{font-size:24px;color:#486b43}output{display:block;min-height:30px;margin:10px 0;color:#9e6c36}code{background:#e8e2ce;padding:2px 5px;border-radius:3px}small{color:#7f876d}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;border-bottom:1px solid #ddd6bf;padding:7px}.states{display:flex;gap:8px;flex-wrap:wrap}.states span{padding:6px 10px;background:#e8e4d2;border-radius:5px}.states .active{background:#426a4d;color:white}@media(max-width:500px){body{padding:15px}h1{font-size:21px}button{padding:9px 12px}.number{padding:8px 12px}}</style>
+<main>
+<h1>07 · 兵营里的小火车</h1>
+<p>最多排队 3 名。先来的先训练，取消会退还全部黄金。</p>
+<div class="numbers"><span class="number">黄金 <b id="gold">12</b></span><span class="number">完成 <b id="army">0</b></span></div><button id="guard">守卫 · 4 金 · 2 秒</button><button id="archer">弓手 · 5 金 · 3 秒</button><button id="cancel" class="secondary">取消最后一名</button><button id="reset" class="secondary">重置</button><div class="board" id="queue">队列空了</div><output id="message">试一试：先排守卫，再排弓手。</output>
+<script>
+"use strict";
+
+let gold=12,army=0,queue=[],last=0;
+function add(name,cost,time){if(queue.length>=3){say('队列满了。');return;}if(gold<cost){say('黄金不够。');return;}gold-=cost;queue.push({name,cost,time});say(name+'进入队列。');}
+function say(text){document.getElementById('message').textContent=text;}
+document.getElementById('guard').onclick=()=>add('守卫',4,2);document.getElementById('archer').onclick=()=>add('弓手',5,3);
+document.getElementById('cancel').onclick=()=>{const unit=queue.pop();if(unit){gold+=unit.cost;say('已退款 '+unit.cost+' 黄金。');}};
+document.getElementById('reset').onclick=()=>{gold=12;army=0;queue=[];};
+function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;
+  if(queue.length){queue[0].time-=dt;if(queue[0].time<=0){const done=queue.shift();army++;say(done.name+'训练完成！');}}
+  document.getElementById('gold').textContent=gold;document.getElementById('army').textContent=army;
+  document.getElementById('queue').textContent=queue.map((u,i)=>`${i+1}. ${u.name}（${u.time.toFixed(1)} 秒）`).join(' → ')||'队列空了';requestAnimationFrame(frame);
+}requestAnimationFrame(frame);
+
+</script>
+<p><small>小设计师任务：把 queue.length>=3 改成 >=2。连续招募时，哪个规则先阻止了购买？</small></p>
+</main>
+</html>

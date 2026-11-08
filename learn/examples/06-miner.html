@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>06 · 矿工的四张任务卡</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:24px;background:#f7f2e6;color:#293b32;font:16px/1.65 system-ui,sans-serif}main{max-width:760px;margin:auto}h1{font-size:24px;margin:0 0 8px}p{margin:9px 0;color:#657362}button,select,input{font:inherit}button{background:#426a4d;color:#fff6df;border:0;border-radius:7px;padding:10px 17px;cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.4;cursor:default}button.secondary{background:#e5decb;color:#52634c}label{display:inline-flex;align-items:center;gap:10px;margin:8px 16px 8px 0}canvas{display:block;width:100%;background:#d9ebd0;border:1px solid #b6c8aa;border-radius:12px;margin:15px 0}.board{background:#fffdf4;border:1px solid #ddd6bf;border-radius:10px;padding:18px;margin:15px 0}.numbers{display:flex;gap:14px;flex-wrap:wrap}.number{background:#ece4c8;padding:10px 16px;border-radius:8px}.number b{font-size:24px;color:#486b43}output{display:block;min-height:30px;margin:10px 0;color:#9e6c36}code{background:#e8e2ce;padding:2px 5px;border-radius:3px}small{color:#7f876d}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;border-bottom:1px solid #ddd6bf;padding:7px}.states{display:flex;gap:8px;flex-wrap:wrap}.states span{padding:6px 10px;background:#e8e4d2;border-radius:5px}.states .active{background:#426a4d;color:white}@media(max-width:500px){body{padding:15px}h1{font-size:21px}button{padding:9px 12px}.number{padding:8px 12px}}</style>
+<main>
+<h1>06 · 矿工的四张任务卡</h1>
+<p>去矿山 → 开采 → 回家 → 交金。只有交金时，黄金盒子才增加。</p>
+<div class="states"><span data-state="go">去矿山</span><span data-state="dig">开采</span><span data-state="return">回家</span><span data-state="deliver">交金</span></div><canvas id="canvas" width="720" height="240"></canvas><div class="numbers"><span class="number">仓库黄金 <b id="gold">0</b></span><span class="number">背包黄金 <b id="cargo">0</b></span></div><button id="pause">暂停观察</button><button id="reset" class="secondary">重置</button><output id="message">规则：每次带回 3 黄金。</output>
+<script>
+"use strict";
+
+const ctx=document.getElementById('canvas').getContext('2d');let x=100,state='go',cargo=0,gold=0,timer=0,last=0,running=true;
+// 火柴人 = 圆脑袋 + 身体 + 四肢。x、y 是脚下的位置。
+function stick(x,y,color='#2e4233',step=0,hat=false){
+  ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=5; ctx.lineCap='round';
+  ctx.beginPath(); ctx.arc(x,y-47,9,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x,y-36); ctx.lineTo(x,y-17);
+  ctx.moveTo(x-13,y-24); ctx.lineTo(x,y-33); ctx.lineTo(x+13,y-23);
+  ctx.moveTo(x-12-step,y); ctx.lineTo(x,y-17); ctx.lineTo(x+12+step,y); ctx.stroke();
+  if(hat){ctx.fillStyle='#c59742';ctx.fillRect(x-13,y-58,26,6);}
+}
+function field(){ctx.clearRect(0,0,720,240);ctx.fillStyle='#a9c689';ctx.fillRect(0,185,720,55);ctx.fillStyle='#98bba0';ctx.beginPath();ctx.moveTo(0,185);ctx.lineTo(160,45);ctx.lineTo(320,185);ctx.lineTo(510,65);ctx.lineTo(720,185);ctx.fill();}
+
+function frame(now){const dt=Math.min((now-last)/1000,.05);last=now;
+  if(running){
+    if(state==='go'){x+=90*dt;if(x>=580){x=580;state='dig';timer=0;}}
+    else if(state==='dig'){timer+=dt;if(timer>=2){cargo=3;state='return';}}
+    else if(state==='return'){x-=90*dt;if(x<=100){x=100;state='deliver';timer=0;gold+=cargo;cargo=0;}}
+    else if(state==='deliver'){timer+=dt;if(timer>=1)state='go';}
+  }
+  field();ctx.fillStyle='#7c8e6b';ctx.fillRect(60,120,80,65);ctx.fillStyle='#c8a041';ctx.beginPath();ctx.moveTo(545,185);ctx.lineTo(580,140);ctx.lineTo(615,185);ctx.fill();stick(x,185,'#344834',state==='go'||state==='return'?Math.sin(now/100)*4:0,true);
+  document.getElementById('gold').textContent=gold;document.getElementById('cargo').textContent=cargo;
+  document.querySelectorAll('[data-state]').forEach(el=>el.classList.toggle('active',el.dataset.state===state));requestAnimationFrame(frame);
+}
+document.getElementById('pause').onclick=e=>{running=!running;e.target.textContent=running?'暂停观察':'继续';};
+document.getElementById('reset').onclick=()=>{x=100;state='go';cargo=gold=timer=0;};requestAnimationFrame(frame);
+
+</script>
+<p><small>小设计师任务：找到 cargo=3，改成 5。先观察背包，再观察仓库，判断哪里应该加钱。</small></p>
+</main>
+</html>

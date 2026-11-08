@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>03 · 钱够不够？</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:24px;background:#f7f2e6;color:#293b32;font:16px/1.65 system-ui,sans-serif}main{max-width:760px;margin:auto}h1{font-size:24px;margin:0 0 8px}p{margin:9px 0;color:#657362}button,select,input{font:inherit}button{background:#426a4d;color:#fff6df;border:0;border-radius:7px;padding:10px 17px;cursor:pointer;margin:4px 6px 4px 0}button:disabled{opacity:.4;cursor:default}button.secondary{background:#e5decb;color:#52634c}label{display:inline-flex;align-items:center;gap:10px;margin:8px 16px 8px 0}canvas{display:block;width:100%;background:#d9ebd0;border:1px solid #b6c8aa;border-radius:12px;margin:15px 0}.board{background:#fffdf4;border:1px solid #ddd6bf;border-radius:10px;padding:18px;margin:15px 0}.numbers{display:flex;gap:14px;flex-wrap:wrap}.number{background:#ece4c8;padding:10px 16px;border-radius:8px}.number b{font-size:24px;color:#486b43}output{display:block;min-height:30px;margin:10px 0;color:#9e6c36}code{background:#e8e2ce;padding:2px 5px;border-radius:3px}small{color:#7f876d}table{border-collapse:collapse;width:100%;font-size:14px}th,td{text-align:left;border-bottom:1px solid #ddd6bf;padding:7px}.states{display:flex;gap:8px;flex-wrap:wrap}.states span{padding:6px 10px;background:#e8e4d2;border-radius:5px}.states .active{background:#426a4d;color:white}@media(max-width:500px){body{padding:15px}h1{font-size:21px}button{padding:9px 12px}.number{padding:8px 12px}}</style>
+<main>
+<h1>03 · 钱够不够？</h1>
+<p>守卫要 4 黄金。试一试黄金为 3、4、5 时，各会发生什么。</p>
+<div class="board"><div class="numbers"><span class="number">黄金 <b id="gold">4</b></span><span class="number">守卫 <b id="guards">0</b></span></div><button id="mine">开采 · +1</button><button id="buy">买守卫 · 4 金</button><button id="three" class="secondary">测试：3 金</button><button id="four" class="secondary">测试：4 金</button><button id="five" class="secondary">测试：5 金</button><output id="message">先猜，再按购买。</output></div>
+<script>
+"use strict";
+
+let gold=4,guards=0;const price=4;
+function show(){document.getElementById('gold').textContent=gold;document.getElementById('guards').textContent=guards;}
+document.getElementById('buy').onclick=()=>{
+  if(gold>=price){gold=gold-price;guards=guards+1;document.getElementById('message').textContent='购买成功！';}
+  else{document.getElementById('message').textContent='还买不起，黄金没有被扣掉。';}
+  show();
+};
+document.getElementById('mine').onclick=()=>{gold++;show();};
+for(const [id,value] of [['three',3],['four',4],['five',5]])document.getElementById(id).onclick=()=>{gold=value;guards=0;show();document.getElementById('message').textContent='准备测试：'+value+' 黄金。';};
+
+</script>
+<p><small>小设计师任务：把判断里的 >= 改成 >。用 4 黄金测试，发现哪里不公平了吗？</small></p>
+</main>
+</html>

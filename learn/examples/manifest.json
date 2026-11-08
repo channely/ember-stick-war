@@ -1,0 +1,92 @@
+[
+  {
+    "lesson": 1,
+    "file": "01-rules.html",
+    "title": "01 · 用豆子造一个兵营",
+    "task": "把起始黄金 gold=4 改成 3。只改这一处，再比较两局。"
+  },
+  {
+    "lesson": 2,
+    "file": "02-memory.html",
+    "title": "02 · 黄金住在哪个盒子里？",
+    "task": "找到 gold=gold+1，把 1 改成 2。按三次，先猜会有多少黄金。"
+  },
+  {
+    "lesson": 3,
+    "file": "03-condition.html",
+    "title": "03 · 钱够不够？",
+    "task": "把判断里的 >= 改成 >。用 4 黄金测试，发现哪里不公平了吗？"
+  },
+  {
+    "lesson": 4,
+    "file": "04-drawing.html",
+    "title": "04 · 一个圆，加上几条线",
+    "task": "找到 stick(360,185，把 360 改成 100。人物往哪边去了？"
+  },
+  {
+    "lesson": 5,
+    "file": "05-walking.html",
+    "title": "05 · 每一小会儿，往前一点",
+    "task": "把 x=x+speed*dt 中的 + 改成 -，看看方向怎样变化。然后恢复。"
+  },
+  {
+    "lesson": 6,
+    "file": "06-miner.html",
+    "title": "06 · 矿工的四张任务卡",
+    "task": "找到 cargo=3，改成 5。先观察背包，再观察仓库，判断哪里应该加钱。"
+  },
+  {
+    "lesson": 7,
+    "file": "07-queue.html",
+    "title": "07 · 兵营里的小火车",
+    "task": "把 queue.length>=3 改成 >=2。连续招募时，哪个规则先阻止了购买？"
+  },
+  {
+    "lesson": 8,
+    "file": "08-combat.html",
+    "title": "08 · 挥剑也要讲规则",
+    "task": "把 range=100 改成 150。更长的武器应该更贵，还是挥得更慢？"
+  },
+  {
+    "lesson": 9,
+    "file": "09-finish.html",
+    "title": "09 · 让故事有开始和结束",
+    "task": "暂停时等 5 秒，黄金应该变化吗？获胜后再等 5 秒，时间应该变化吗？"
+  },
+  {
+    "lesson": 10,
+    "file": "10-levels.html",
+    "title": "10 · 三张地图，三个问题",
+    "task": "找到 LEVELS 数组，只把雪地的 enemyEvery:9 改成 12。感觉有什么变化？"
+  },
+  {
+    "lesson": 11,
+    "file": "11-detective.html",
+    "title": "11 · 当一次游戏侦探",
+    "task": "试着口头解释：价格前一个数、价格本身、价格后一个数，为什么都要测试？"
+  },
+  {
+    "lesson": 12,
+    "file": "12-our-kingdom.html",
+    "title": "12 · 我们的火柴人王国 v1",
+    "task": "修改页面 h1 中的王国名字，在设计师日记里写下：我改了什么、为什么、怎样验证。"
+  },
+  {
+    "lesson": 13,
+    "file": "13-gold-journey.html",
+    "title": "进阶 A · 黄金的回家路",
+    "task": "先观察背包和仓库，完成一次交金。再只改变背包容量，比较搬完同样黄金的步数。"
+  },
+  {
+    "lesson": 14,
+    "file": "14-action-clock.html",
+    "title": "进阶 B · 挥剑的三拍",
+    "task": "按攻击后逐步推进；在准备阶段把木桩移远。比较动作完成与真正命中的区别。"
+  },
+  {
+    "lesson": 15,
+    "file": "15-teamwork.html",
+    "title": "进阶 C · 谁来保护弓手？",
+    "task": "固定六颗金币、固定敌人，只交换盾兵与弓手的前后位置，比较结果并解释。"
+  }
+]
