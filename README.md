@@ -2,19 +2,20 @@
 
 中文单人浏览器策略游戏。采矿、招募、军团指挥与单兵操控组成完整战斗：六种兵种拥有独立动作，30 关逐步解锁科技并检验不同策略。附带面向二年级孩子和家长的游戏制作工坊。
 
-- [游戏](https://ember-stick-war.channely.chatgpt.site/)
-- [亲子工坊：12 课与 3 个进阶实验](https://ember-stick-war.channely.chatgpt.site/learn/)
-- [版本与下载](https://ember-stick-war.channely.chatgpt.site/release/)
-- [私有 GitHub 仓库](https://github.com/channely/-ember-stick-war)
+- [GitHub Pages 游戏入口](https://channely.github.io/ember-stick-war/)
+- [亲子工坊：12 课与 3 个进阶实验](https://channely.github.io/ember-stick-war/learn/)
+- [版本与下载](https://channely.github.io/ember-stick-war/release/)
+- [GitHub 仓库](https://github.com/channely/ember-stick-war)
+- [原私有 Sites 入口](https://ember-stick-war.channely.chatgpt.site/)
 - [教程 PDF](dist/learn/downloads/parent-child-guide-0.3.0.pdf) · [离线材料包](dist/learn/downloads/ember-family-kit-0.3.0.zip) · [打印活动卡](dist/learn/downloads/designer-cards-0.3.0.pdf)
 
-原 Sites 站点和源码仓库保持私有。游戏与学习进度保存在当前浏览器，不上传到服务器。
+GitHub Pages 网站和当前源码仓库公开访问，原 Sites 站点继续保持私有。游戏与学习进度保存在当前浏览器，不上传到服务器。
 
 ## GitHub Pages
 
-已提供 `gh-pages` 发布脚本，发布当前版本到项目网址 `https://channely.github.io/-ember-stick-war/`。首次开启需要在仓库 [Settings → Pages](https://github.com/channely/-ember-stick-war/settings/pages) 选择 **Deploy from a branch → gh-pages → /(root)** 并保存；构建成功后网址才可访问。
+已启用项目网址 <https://channely.github.io/ember-stick-war/>。仓库 [Settings → Pages](https://github.com/channely/ember-stick-war/settings/pages) 使用 **Deploy from a branch → gh-pages → /(root)**，推送发布分支会触发自动构建。
 
-后续提交并推送主分支后，运行 `python scripts/publish-github-pages.py` 更新网页。完整源码 ZIP 不进入 Pages，源码下载仍需私有仓库权限。私有仓库使用 Pages 需要支持该功能的 GitHub 套餐，网站默认公开访问。步骤及验证方式见 [GitHub Pages 发布说明](docs/GITHUB-PAGES.md)。
+后续提交并推送主分支后，运行 `python scripts/publish-github-pages.py` 更新网页。完整源码 ZIP 不复制到 Pages，版本页的源码下载链接指向 GitHub 仓库。步骤及验证方式见 [GitHub Pages 发布说明](docs/GITHUB-PAGES.md)。
 
 ## 这一版怎么玩
 

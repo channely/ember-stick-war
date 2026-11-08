@@ -20,8 +20,8 @@ def publish():
     if git('status', '--porcelain', '--untracked-files=normal'):
         raise SystemExit('Commit tracked changes before publishing their exact source state.')
     remote = git('remote', 'get-url', REMOTE)
-    if remote not in {'https://github.com/channely/-ember-stick-war.git', 'git@github.com:channely/-ember-stick-war.git'}:
-        raise SystemExit('The github remote must point to channely/-ember-stick-war.')
+    if remote not in {'https://github.com/channely/ember-stick-war.git', 'git@github.com:channely/ember-stick-war.git'}:
+        raise SystemExit('The github remote must point to channely/ember-stick-war.')
     subprocess.run([sys.executable, str(ROOT / 'scripts/prepare-github-pages.py')], cwd=ROOT, check=True)
     tip = git('ls-remote', '--heads', REMOTE, f'refs/heads/{BRANCH}')
     parent = tip.split()[0] if tip else None
@@ -45,7 +45,7 @@ def publish():
     # No force push: a concurrent deployment fails instead of overwriting it.
     subprocess.run(['git', 'push', REMOTE, f'{commit}:refs/heads/{BRANCH}'], cwd=ROOT, check=True)
     print(f'Static build pushed to {BRANCH}: {commit}')
-    print('Pages activation: https://github.com/channely/-ember-stick-war/settings/pages')
+    print('Pages settings: https://github.com/channely/ember-stick-war/settings/pages')
 
 
 if __name__ == '__main__':
