@@ -8,7 +8,13 @@
 - [私有 GitHub 仓库](https://github.com/channely/-ember-stick-war)
 - [教程 PDF](dist/learn/downloads/parent-child-guide-0.3.0.pdf) · [离线材料包](dist/learn/downloads/ember-family-kit-0.3.0.zip) · [打印活动卡](dist/learn/downloads/designer-cards-0.3.0.pdf)
 
-站点和仓库保持私有。游戏与学习进度保存在当前浏览器，不上传到服务器。
+原 Sites 站点和源码仓库保持私有。游戏与学习进度保存在当前浏览器，不上传到服务器。
+
+## GitHub Pages
+
+已提供 `gh-pages` 发布脚本，发布当前版本到项目网址 `https://channely.github.io/-ember-stick-war/`。首次开启需要在仓库 [Settings → Pages](https://github.com/channely/-ember-stick-war/settings/pages) 选择 **Deploy from a branch → gh-pages → /(root)** 并保存；构建成功后网址才可访问。
+
+后续提交并推送主分支后，运行 `python scripts/publish-github-pages.py` 更新网页。完整源码 ZIP 不进入 Pages，源码下载仍需私有仓库权限。私有仓库使用 Pages 需要支持该功能的 GitHub 套餐，网站默认公开访问。步骤及验证方式见 [GitHub Pages 发布说明](docs/GITHUB-PAGES.md)。
 
 ## 这一版怎么玩
 
